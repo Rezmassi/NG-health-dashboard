@@ -27,7 +27,7 @@ def fetch_hdx_malaria_data():
                     'CharacteristicLabel': 'State',
                     'Value': 'Malaria_Prevalence'
                 })
-                # We filter for only the most recent survey rows if needed
+                # filter for only the most recent survey rows if needed
                 return df[['State', 'Malaria_Prevalence']]
             return df
         else:

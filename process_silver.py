@@ -45,9 +45,9 @@ def process_silver_layer():
         print(f"❌ Error processing state data: {e}")
 
 
-    # --- PART 2: NATIONAL TRENDS (The block you asked about) ---
+    # --- PART 2: NATIONAL TRENDS---
     try:
-        # Load the national files you created in your ingestion scripts
+        # Load the national files created in ingestion scripts
         malaria_national = pd.read_csv("data/01_bronze/malaria_raw.csv")
         malnutrition_national = pd.read_csv("data/01_bronze/malnutrition_raw.csv")
 

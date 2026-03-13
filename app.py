@@ -42,10 +42,12 @@ def load_state_data():
 @st.cache_data
 def load_trend_data():
     try:
-        return pd.read_csv("data/02_silver/national_health_trends.csv")
+        return pd.read_csv("data/03_gold/stunting_analytics.csv")
     except FileNotFoundError:
         st.error("Missing Trends CSV file. Please run process_silver.py.")
         st.stop()
+
+    
 
 # Initialize Data
 df_states = load_state_data()
@@ -135,7 +137,7 @@ if view_option == "Malaria: Geographic Spread":
 else:
     st.title("🥗 Child Malnutrition Analysis")
     
-    # Dynamic Metric based on the latest year in your CSV
+    # Dynamic Metric based on the latest year in CSV
     latest_year = int(df_trends['Year'].dropna().iloc[-1])
     latest_stunting = df_trends['Stunting_Rate'].dropna().iloc[-1]
     
@@ -161,6 +163,8 @@ else:
     ).properties(height=450)
     
     st.altair_chart(chart, use_container_width=True)
+
+    #track 3......
     
     # Professional Caption for Transparency
     st.caption(f"""
