@@ -123,7 +123,7 @@ if view_option == "Malaria: Geographic Spread":
                 fill=True,
                 fill_opacity=0.7
             ).add_to(m)
-        st_folium(m, width="100%", height=500, key="malaria_map")
+        st_folium(m, width=700, height=500, key="malaria_map", use_container_width=True)
 
     with col2:
         st.write("**Zone Breakdown**")
