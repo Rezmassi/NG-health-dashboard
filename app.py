@@ -146,7 +146,7 @@ if view_option == "Malaria: Geographic Spread":
         st.dataframe(
             df_filtered[['state', 'Malaria_Prevalence']].sort_values(by="Malaria_Prevalence", ascending=False),
             hide_index=True,
-            use_container_width=True
+            width = "stretch"
         )
 
 # --- TRACK 2: MALNUTRITION (ALTAIR CHART) ---
@@ -178,7 +178,7 @@ else:
         tooltip=['Year', 'Stunting_Rate']
     ).properties(height=450)
     
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width = "stretch")
 
     #track 3......
     
