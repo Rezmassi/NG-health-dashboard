@@ -144,14 +144,19 @@ if view_option == "Malaria: Geographic Spread":
     with col2:
             st.write("**Zone Breakdown**")
             
+            # 1. Create a clean copy and force standard types
             
             display_df = df_filtered[['state', 'Malaria_Prevalence']].sort_values(
                 by="Malaria_Prevalence", ascending=False
             ).copy()
             
-            # FORCE standard string type to fix "LargeUtf8" error
             display_df['state'] = display_df['state'].astype(str)
+            display_df['Malaria_Prevalence'] = display_df['Malaria_Prevalence'].astype(float)
             
+            # 2. Reset index to remove hidden LargeUtf8 index metadata
+            display_df = display_df.reset_index(drop=True)
+            
+            # 3. Use universal parameters only
             st.dataframe(
                 display_df,
                 use_container_width=True
@@ -175,13 +180,12 @@ else:
     st.markdown(f"#### National Stunting Progress (1990 - {latest_year})")
     
     # Altair Chart Setup
+
     chart_data = df_trends[['Year', 'Stunting_Rate']].dropna().copy()
 
-    # 1. FORCE standard types to prevent LargeUtf8/Arrow errors
+    # Force standard types and reset index
     chart_data['Year'] = chart_data['Year'].astype(int)
     chart_data['Stunting_Rate'] = chart_data['Stunting_Rate'].astype(float)
-
-    # 2. Reset index to ensure no "hidden" LargeUtf8 index columns are passed
     chart_data = chart_data.reset_index(drop=True)
     
     chart = alt.Chart(chart_data).mark_line(
@@ -193,12 +197,12 @@ else:
         tooltip=['Year', 'Stunting_Rate']
     ).properties(height=450)
     
-    # Use use_container_width=True since that's what your server currently supports
+    # Use the parameter supported by your server
     st.altair_chart(chart, use_container_width=True)
 
     # Track 3......
     
-    # Professional Caption for Transparency
+    # Professional Caption 
     st.caption(f"""
         **Data Insight:** The visualization concludes in {latest_year} based on the most recent 
         official survey cycle integrated into the dataset. National health surveys 
