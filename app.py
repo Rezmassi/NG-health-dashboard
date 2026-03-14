@@ -142,12 +142,13 @@ if view_option == "Malaria: Geographic Spread":
         folium_static(m, width=800) 
 
     with col2:
-        st.write("**Zone Breakdown**")
-        st.dataframe(
-            df_filtered[['state', 'Malaria_Prevalence']].sort_values(by="Malaria_Prevalence", ascending=False),
-            hide_index=True,
-            width = "stretch"
-        )
+            st.write("**Zone Breakdown**")
+            
+            st.dataframe(
+                df_filtered[['state', 'Malaria_Prevalence']].sort_values(by="Malaria_Prevalence", ascending=False),
+                column_config={"_index": None}, 
+                width="stretch"
+            )
 
 # --- TRACK 2: MALNUTRITION (ALTAIR CHART) ---
 else:
