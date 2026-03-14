@@ -85,7 +85,8 @@ search_query = st.sidebar.selectbox(
 )
 
 # Filtering Logic
-df_filtered = df_states[df_states['Zone'].isin(selected_zones)]
+df_filtered = df_states[df_states['Zone'].isin(selected_zones)].copy()
+df_filtered['Malaria_Prevalence'] = pd.to_numeric(df_filtered['Malaria_Prevalence'], errors='coerce').fillna(0)
 
 # 5. MAIN INTERFACE LOGIC
 
@@ -109,21 +110,32 @@ if view_option == "Malaria: Geographic Spread":
             map_center = [9.08, 8.67]
             zoom = 6
             
+        # Create a dynamic key to force the map to refresh properly
+        map_key = f"map_{len(df_filtered)}_{search_query}"
+
         m = folium.Map(location=map_center, zoom_start=zoom, tiles="CartoDB positron")
         
         for _, row in df_filtered.iterrows():
+            # Ensure prevalence is a clean number
+            prev = float(row.get('Malaria_Prevalence', 0))
+            
             is_searched = (row['state'] == search_query)
             color = "#FFD700" if is_searched else "#D90429"
             
+            # Use max() to ensure radius is NEVER 0 or NaN
+            safe_radius = max(prev * 0.7, 1.0) if not is_searched else 20
+            
             folium.CircleMarker(
                 location=[row['lat'], row['lon']],
-                radius=row['Malaria_Prevalence'] * 0.7 if not is_searched else 20,
-                popup=f"State: {row['state']}<br>Prevalence: {row['Malaria_Prevalence']}%",
+                radius=safe_radius,
+                popup=f"State: {row['state']}<br>Prevalence: {prev}%",
                 color=color,
                 fill=True,
                 fill_opacity=0.7
             ).add_to(m)
-        st_folium(m, width=700, height=500, key="malaria_map", use_container_width=True)
+        
+        # Call st_folium with the dynamic key
+        st_folium(m, use_container_width=True, height=500, key=map_key)
 
     with col2:
         st.write("**Zone Breakdown**")
