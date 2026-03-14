@@ -100,45 +100,46 @@ if view_option == "Malaria: Geographic Spread":
     if pd.isna(avg_prev):
         avg_prev = 0
     st.metric("Avg Prevalence in Selected Zones", f"{float(avg_prev):.1f}%")
-    
+
     col1, col2 = st.columns([3, 1])
     
     with col1:
-        # Map Centering Logic
-        if search_query:
-            state_info = df_states[df_states['state'] == search_query].iloc[0]
-            map_center = [state_info['lat'], state_info['lon']]
-            zoom = 8
-        else:
-            map_center = [9.08, 8.67]
-            zoom = 6
-            
-        # Create a dynamic key to force the map to refresh properly
-        map_key = f"map_{len(df_filtered)}_{search_query}"
+        # --- MAP CENTERING LOGIC ---
+        map_center = [9.08, 8.67] # Default: Center of Nigeria
+        zoom = 6
 
+        if search_query:
+            state_matches = df_states[df_states['state'] == search_query]
+            if not state_matches.empty:
+                state_info = state_matches.iloc[0]
+                map_center = [float(state_info['lat']), float(state_info['lon'])]
+                zoom = 8
+
+        # --- CREATE MAP ---
         m = folium.Map(location=map_center, zoom_start=zoom, tiles="CartoDB positron")
         
         for _, row in df_filtered.iterrows():
-            # Ensure prevalence is a clean number
-            prev = float(row.get('Malaria_Prevalence', 0))
+            lat_val = float(row['lat'])
+            lon_val = float(row['lon'])
+            prev_val = float(row.get('Malaria_Prevalence', 0))
             
-            is_searched = (row['state'] == search_query)
-            color = "#FFD700" if is_searched else "#D90429"
+            is_searched = (str(row['state']) == str(search_query))
+            marker_color = "#FFD700" if is_searched else "#D90429"
             
-            # Use max() to ensure radius is NEVER 0 or NaN
-            safe_radius = max(prev * 0.7, 1.0) if not is_searched else 20
+            rad = float(max(prev_val * 0.7, 1.0) if not is_searched else 20.0)
+            popup_text = f"State: {row['state']} | Prevalence: {prev_val}%"
             
             folium.CircleMarker(
-                location=[row['lat'], row['lon']],
-                radius=safe_radius,
-                popup=f"State: {row['state']}<br>Prevalence: {prev}%",
-                color=color,
+                location=[lat_val, lon_val],
+                radius=rad,
+                popup=folium.Popup(popup_text, parse_html=True),
+                color=marker_color,
                 fill=True,
                 fill_opacity=0.7
             ).add_to(m)
         
-        # Call st_folium with the dynamic key
-        st_folium(m, use_container_width=True, height=500)
+        # --- RENDER ---
+        folium_static(m, width=800) 
 
     with col2:
         st.write("**Zone Breakdown**")
