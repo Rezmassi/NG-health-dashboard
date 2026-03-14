@@ -144,21 +144,16 @@ if view_option == "Malaria: Geographic Spread":
     with col2:
             st.write("**Zone Breakdown**")
             
-            # 1. Create a clean copy and force standard types
             
-            display_df = df_filtered[['state', 'Malaria_Prevalence']].sort_values(
+            display_data = df_filtered[['state', 'Malaria_Prevalence']].sort_values(
                 by="Malaria_Prevalence", ascending=False
-            ).copy()
+            ).to_dict('records')
             
-            display_df['state'] = display_df['state'].astype(str)
-            display_df['Malaria_Prevalence'] = display_df['Malaria_Prevalence'].astype(float)
-            
-            # 2. Reset index to remove hidden LargeUtf8 index metadata
-            display_df = display_df.reset_index(drop=True)
-            
-            # 3. Use universal parameters only
+            clean_df = pd.DataFrame(display_data)
+
+            # 2. ONLY parameters supported by Streamlit 1.19.0
             st.dataframe(
-                display_df,
+                clean_df,
                 use_container_width=True
             )
 
@@ -181,11 +176,13 @@ else:
     
     # Altair Chart Setup
 
+    # Altair Chart Setup
+    # Force types to standard Python types to satisfy the older Arrow version
     chart_data = df_trends[['Year', 'Stunting_Rate']].dropna().copy()
-
-    # Force standard types and reset index
     chart_data['Year'] = chart_data['Year'].astype(int)
     chart_data['Stunting_Rate'] = chart_data['Stunting_Rate'].astype(float)
+    
+    # Use reset_index to prevent index-based LargeUtf8 errors
     chart_data = chart_data.reset_index(drop=True)
     
     chart = alt.Chart(chart_data).mark_line(
@@ -197,7 +194,6 @@ else:
         tooltip=['Year', 'Stunting_Rate']
     ).properties(height=450)
     
-    # Use the parameter supported by your server
     st.altair_chart(chart, use_container_width=True)
 
     # Track 3......
