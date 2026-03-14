@@ -34,7 +34,8 @@ def load_state_data():
     rows = []
     for feature in data['features']:
         row = feature['properties']
-        row['lon'], row['lat'] = feature['geometry']['coordinates']
+        lon, lat = feature['geometry']['coordinates']
+        row['lon'], row['lat'] = float(lon), float(lat)
         row['Zone'] = state_to_zone.get(row['state'], 'Unknown')
         rows.append(row)
     return pd.DataFrame(rows)
@@ -95,9 +96,11 @@ if view_option == "Malaria: Geographic Spread":
     st.title("🦟 Malaria Tracking (State-Level)")
     
     # KPIs for filtered zones
-    avg_prev = df_filtered['Malaria_Prevalence'].mean() if not df_filtered.empty else 0
-    st.metric("Avg Prevalence in Selected Zones", f"{avg_prev:.1f}%")
-
+    avg_prev = df_filtered['Malaria_Prevalence'].mean()
+    if pd.isna(avg_prev):
+        avg_prev = 0
+    st.metric("Avg Prevalence in Selected Zones", f"{float(avg_prev):.1f}%")
+    
     col1, col2 = st.columns([3, 1])
     
     with col1:
@@ -135,7 +138,7 @@ if view_option == "Malaria: Geographic Spread":
             ).add_to(m)
         
         # Call st_folium with the dynamic key
-        st_folium(m, use_container_width=True, height=500, key=map_key, returned_objects=[])
+        st_folium(m, use_container_width=True, height=500)
 
     with col2:
         st.write("**Zone Breakdown**")
