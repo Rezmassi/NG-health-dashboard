@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import folium
-from streamlit_folium import st_folium
+from streamlit_folium import st_folium, folium_static
 import altair as alt
 
 # 1. PAGE CONFIGURATION
@@ -135,7 +135,7 @@ if view_option == "Malaria: Geographic Spread":
             ).add_to(m)
         
         # Call st_folium with the dynamic key
-        st_folium(m, use_container_width=True, height=500, key=map_key)
+        st_folium(m, use_container_width=True, height=500, key=map_key, returned_objects=[])
 
     with col2:
         st.write("**Zone Breakdown**")
