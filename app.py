@@ -142,18 +142,25 @@ if view_option == "Malaria: Geographic Spread":
         folium_static(m, width=800) 
 
     with col2:
-            st.write("**Zone Breakdown**")
+            st.write("**Zone Breakdown (Ranked)**")
             
-            
-            display_data = df_filtered[['state', 'Malaria_Prevalence']].sort_values(
+            # 1. Prepare and Sort Data
+            display_df = df_filtered[['state', 'Malaria_Prevalence']].sort_values(
                 by="Malaria_Prevalence", ascending=False
-            ).to_dict('records')
+            ).copy()
             
-            clean_df = pd.DataFrame(display_data)
-
-            # 2. ONLY parameters supported by Streamlit 1.19.0
+            # 2. Add the Rank column starting at 1
+            display_df.insert(0, 'Rank', range(1, len(display_df) + 1))
+            
+            # 3. Clean Display using modern column_config
             st.dataframe(
-                clean_df,
+                display_df,
+                column_config={
+                    "Rank": st.column_config.NumberColumn("Rank", format="%d"),
+                    "state": "State",
+                    "Malaria_Prevalence": st.column_config.NumberColumn("Prevalence (%)", format="%.1f%%")
+                },
+                hide_index=True,
                 use_container_width=True
             )
 
