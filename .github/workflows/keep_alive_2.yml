@@ -1,0 +1,15 @@
+name: Wake Up Dashboard
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Full Page Request
+        run: |
+          curl -L -k --max-time 20 --retry 3 -A "Mozilla/5.0" https://ng-health-dashboard.streamlit.app/ | head -n 10
+          echo "Knocked on the door at $(date)"
