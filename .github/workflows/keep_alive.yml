@@ -2,8 +2,8 @@ name: Wake Up Dashboard
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Runs every 30 minutes
-  workflow_dispatch:      # Allows you to click a button in GitHub to run it manually
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
@@ -11,5 +11,6 @@ jobs:
     steps:
       - name: Full Page Request
         run: |
-          curl -s -L https://ng-health-dashboard.streamlit.app/ > /dev/null
+          # Added -A (User Agent) and -f (fail silently but return error code)
+          curl -I -L -s -A "Mozilla/5.0" https://ng-health-dashboard.streamlit.app/
           echo "Knocked on the door at $(date)"
